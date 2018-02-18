@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 Download Software:
 * MySQLWorkbench - https://dev.mysql.com/downloads/workbench/
-* A php editor (Brackets) - http://brackets.io/
+* A php editor (Atom) - https://atom.io/
 * MAMP (Mac) - https://www.mamp.info/en/downloads/
   * (no need for MAMP Pro)
 * XAMPP (Windows) - https://www.apachefriends.org/index.html

@@ -19,6 +19,10 @@ Technology:
 * Currently the backend is on Amazon Web Services (AWS) but it will all be moved to a serve on Drury's campus
   * AWS - https://console.aws.amazon.com/console/home
 
+Repository Structure:
+* adminPHP: the php script creating the admin page for managing the database information
+* jsonPHP: the php script creating the JSON objects that holds the information from the database for the trees
+
 ### Setting Up Environment
 
 #### Running PHP Script

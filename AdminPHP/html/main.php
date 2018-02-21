@@ -3,7 +3,7 @@
         <title>Manage Trees</title>
         <script>
             function commonName() {
-              // Declare variables 
+              // Declare variables
               var input, filter, table, tr, td, i;
               input = document.getElementById("myInput");
               filter = input.value.toUpperCase();
@@ -19,11 +19,11 @@
                   } else {
                     tr[i].style.display = "none";
                   }
-                } 
+                }
               }
             }
             function scientificName() {
-              // Declare variables 
+              // Declare variables
               var input, filter, table, tr, td, i;
               input = document.getElementById("myInput");
               filter = input.value.toUpperCase();
@@ -39,12 +39,12 @@
                   } else {
                     tr[i].style.display = "none";
                   }
-                } 
+                }
               }
             }
         </script>
 
-        <style type='text/css'>  
+        <style type='text/css'>
             html {
                 font-family: "Roboto", sans-serif;
             }
@@ -82,9 +82,9 @@
                 height: 50px;
                 padding: 15px;
             }
-            
+
             body {
-                background: #8DC26F; /* fallback for old browsers */    
+                background: #8DC26F; /* fallback for old browsers */
             }
             a {
                 color: #8DC26F;
@@ -92,6 +92,7 @@
             a:hover {
                 color: #43A047;
             }
+
             .delete:hover {
                 color:red;
             }
@@ -105,7 +106,7 @@
 
                 text-decoration: none;
                 color: initial;
-                
+
                 font-family: "Roboto", sans-serif;
                 text-transform: uppercase;
                 outline: 0;
@@ -157,11 +158,11 @@
         <h1>Manage Trees</h1>
             <h2><a href="add.php" class="addTree">Add Trees</a>
         </h2>
-            <input type="text" id="myInput" onkeyup="commonName()" placeholder="Search for Common Names">
+            <input type="text" id="myInput" class="myInput" onkeyup="commonName()" placeholder="Search for Common Names">
 <!--            <input type="text" id="myInput" onkeyup="scientificName()" placeholder="Search for Scientific Names">-->
-    <?php 
+    <?php
         include("../protected/config.php");
-    
+
 //        // Check connection
 //        if ($db->connect_error) {
 //            die("Connection failed: " . $db->connect_error);
@@ -170,7 +171,7 @@
 //            echo "Connected successfully";
 //        }
 
-        $sql = "SELECT id, common_name, scientific_name, latitude, longitude, image, description, tour_bool FROM treeMapDB.treesTable";
+        $sql = "SELECT id, common_name, scientific_name, latitude, longitude, description, tour_bool FROM treeMapDB.treesTable";
         $result = $db->query($sql);
 
         if ($result->num_rows > 0) {
@@ -182,8 +183,8 @@
                     <th>Scienctific Name</th>
                     <th>Latitude</th>
                     <th>Longitude</th>
-                    <th>Image</th>
                     <th>Description</th>
+                    <th>Image</th>
                     <th>21 Tree Tour</th>
                     <th>Manage</th>
                 </tr>
@@ -197,8 +198,8 @@
                             <td id="scientific_name"/>' . $row["scientific_name"] . ' </td>
                             <td id="latitude"/>' . $row["latitude"] . ' </td>
                             <td id="longitude"/>' . $row["longitude"] . ' </td>
-                            <td id="image"/>' . $row["image"] . ' </td>
                             <td id="description"/>' . $row["description"] . ' </td>
+                            <td id="image"/>image</td>
                             <td id="tour_bool"/>' . $row["tour_bool"] . ' </td>
                             <td><a href="edit.php?id=' . $row["id"] .'">Edit</a> | <a href="delete.php?id=' . $row["id"] .'" onClick="javascript:confirmationDelete('. $row["id"] .');return false;" class="delete">Delete</a></td>
                         </tr>';
@@ -206,8 +207,8 @@
     } else {
         echo "0 results";
         ?>
-        </table>    
-    <?php 
+        </table>
+    <?php
     }
     $db->close();
 ?>

@@ -1,52 +1,128 @@
 <?php
 // including the database connection file
 include_once("../protected/config.php");
- 
+
+// file upload extension to allow
+$allowedExts = array("jpg", "jpeg", "gif","png",".png", "mp3", "mp4", "wma");
+$extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
+
+//when submit occurs
 if(isset($_POST['add']))
-{    
+{
     $common_name=$_POST['common_name'];
     $scientific_name=$_POST['scientific_name'];
-    $latitude=$_POST['latitude'];   
-    $longitude=$_POST['longitude']; 
+    $latitude=$_POST['latitude'];
+    $longitude=$_POST['longitude'];
     $filepath=$_POST['filepath'];
     $description=$_POST['description'];
     $tour_bool=$_POST['tour_bool'];
-    
+    $image=$_FILES["image"]["name"];
+
     // checking empty fields
-    if(empty($common_name) || empty($scientific_name) || empty($latitude) || empty($longitude)) {            
+    if(empty($common_name) || empty($scientific_name) || empty($latitude) || empty($longitude)) {
         if(empty($common_name)) {
             $msgCN = "Common name field is empty. <br />";
         }
-        
+
         if(empty($scientific_name)) {
             $msgSN = "Scientific name field is empty. <br />";
         }
-        
+
         if(empty($latitude)) {
             $msgLat = "Latitude field is empty. <br />";
-        }   
+        }
         if(empty($longitude)) {
             $msgLong = "Longitude field is empty. <br />";
-        } 
-    } else {    
-        //updating the table
-        $result = mysqli_query($db, "INSERT INTO treeMapDB.treesTable (common_name, scientific_name, latitude, longitude, filepath, description, tour_bool) VALUES ('$common_name', '$scientific_name', '$latitude', '$longitude', '$filepath', '$description', '$tour_bool')");
-        
-        //redirectig to the display page. In our case, it is index.php
-        header("Location: main.php");
+        }
+    } else {
+        $msgTest = "one";
+        //file field is not empty
+        if (!empty($_FILES["image"]["name"]) && !empty($_FILES["image"]['tmp_name'])) {
+          $msgTest = "in if isset";
+            if ((($_FILES["image"]["type"] == "video/mp4")
+            || ($_FILES["image"]["type"] == "audio/mp3")
+            || ($_FILES["image"]["type"] == "audio/wma")
+            || ($_FILES["image"]["type"] == "image/jpg")
+            || ($_FILES["image"]["type"] == "image/gif")
+            || ($_FILES["image"]["type"] == "image/png")
+            || ($_FILES["image"]["type"] == "image/jpeg"))
+            //&& ($_FILES["file"]["size"] < 20000)
+            && in_array($extension, $allowedExts)){
+              $msgTest = "in type check";
+                // upload error
+                if ($_FILES["image"]["error"] > 0)
+                    {
+                    $msgError = "File Upload Error: " . $_FILES["image"]["error"];
+                    }
+                //correct file extension
+                else{
+                   //if file already exits
+                    if (file_exists("upload/" . $_FILES["image"]["name"]))
+                      {
+                        $msgError = "File already exits: ".$_FILES["image"]["name"];
+                      }
+                    //new file to upload
+                    else{
+                      $msgTest = "in upload";
+                        $filepath = 'upload/' . $image;
+
+                        //save file in folder
+                        move_uploaded_file($_FILES["image"]["tmp_name"],
+                        $filepath);
+
+                        //two queries
+                        $sql = "INSERT INTO treeMapDB.treesTable (common_name, scientific_name, latitude, longitude, filepath, description, tour_bool) VALUES ('$common_name', '$scientific_name', '$latitude', '$longitude', '$filepath', '$description', '$tour_bool');";
+
+                        $sql .= "INSERT INTO treeMapDB.imageTable (treeid, filepath) VALUES ((SELECT id FROM treeMapDB.treesTable WHERE common_name = '$common_name' AND scientific_name = '$scientific_name' AND filepath = '$filepath' AND longitude = '$longitude' AND latitude = '$latitude'),'$filepath');";
+
+                        //execute multi query
+                        if (!$db->multi_query($sql)) {
+                            $error = "Multi query failed: (" . $db->errno . ") " . $db->error;
+                        }
+
+                        do {
+                            if ($res = $db->store_result()) {
+                                var_dump($res->fetch_all(MYSQLI_ASSOC));
+                                $res->free();
+                            }
+                        } while ($db->more_results() && $db->next_result());
+                    }
+                  }
+            }
+        }
+        //no file uploaded...
+        else{
+            //updating the trees table
+            $result = mysqli_query($db, "INSERT INTO treeMapDB.treesTable (common_name, scientific_name, latitude, longitude, filepath, description, tour_bool) VALUES ('$common_name', '$scientific_name', '$latitude', '$longitude', '$filepath', '$description', '$tour_bool')");
+        }
+
+        $__DEBUG__ = false;
+        if(!$__DEBUG__){
+          //redirectig to the display page. In our case, it is index.php
+          header("Location: main.php");
+        }
+        else{
+          //error messages
+          if (!$db) {
+              $errorMessage = 'Connect Error (' . mysqli_connect_errno() . ')' . mysqli_connect_error();
+              die('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+          }else{
+            $errorMessage = 'Connected... ' . mysqli_get_host_info($db) . "\n";
+          }
+        }
     }
 }
 ?>
 
 <html>
-<head>    
+<head>
     <title>Edit Data</title>
     <style>
         html {
                 font-family: "Roboto", sans-serif;
             }
         body {
-                background: #8DC26F; /* fallback for old browsers */    
+                background: #8DC26F; /* fallback for old browsers */
             }
         .home {
                 -webkit-appearance: button;
@@ -55,7 +131,7 @@ if(isset($_POST['add']))
 
                 text-decoration: none;
                 color: initial;
-                
+
                 font-family: "Roboto", sans-serif;
                 text-transform: uppercase;
                 outline: 0;
@@ -129,41 +205,42 @@ if(isset($_POST['add']))
         }
     </style>
 </head>
- 
+
 <body>
     <h2><a href="main.php" class="home">Home</a></h2>
     <div class="form">
         <img src="../photos/TeamLogo.png" alt="Team Logo">
         <h1>Add Tree</h1>
-        <?php echo "<h2 class='error'>".$msgCN.$msgSN.$msgLat.$msgLong."</h2>"; ?>
-    
-    <form name="add" method="post" action="add.php">
+        <?php echo "<h2 class='error'>".$errorMessage.$msgTest.$msglocation.$error.$msglocation.$msgError.$msgCN.$msgSN.$msgLat.$msgLong."</h2>"; ?>
+
+    <form name="add" method="post" action="add.php" enctype="multipart/form-data">
         <table border="0">
-            <tr> 
+            <tr>
                 <td>Common Name</td>
                 <td><input type="text" name="common_name" placeholder="Required" class="input" <?php if (!empty($_POST['common_name'])) {echo "value='" . $_POST["common_name"] . "'";} ?>></td>
             </tr>
-            <tr> 
+            <tr>
                 <td>Scientific Name</td>
                 <td><textarea type="text" name="scientific_name" placeholder="Required" class="input"><?php if (!empty($_POST['scientific_name'])) {echo $_POST["scientific_name"];} ?></textarea></td>
             </tr>
-            <tr> 
+            <tr>
                 <td>Latitude</td>
                 <td><input type="text" name="latitude" placeholder="Required" class="input" <?php if (!empty($_POST['latitude'])) {echo "value='" . $_POST["latitude"] . "'";} ?>></td>
             </tr>
-            <tr> 
+            <tr>
                 <td>Longitude</td>
                 <td><input type="text" name="longitude" placeholder="Required" class="input" <?php if (!empty($_POST['longitude'])) {echo "value='" . $_POST["longitude"] . "'";} ?>></td>
             </tr>
-            <tr> 
-                <td>Filepath</td>
-                <td><textarea type="text" name="filepath" class="input"><?php if (!empty($_POST['filepath'])) {echo $_POST["filepath"];} ?></textarea></td>
+            <tr>
+                <td>Add Image</td>
+                <td><input type="file" name="image" id="image" />
+                    <br /></td>
             </tr>
-            <tr> 
+            <tr>
                 <td>Description</td>
                 <td><textarea type="text" name="description" class="input"><?php if (!empty($_POST['description'])) {echo $_POST["description"];} ?></textarea></td>
             </tr>
-            <tr> 
+            <tr>
                 <td>21 Tree Tour</td>
                 <td><textarea type="text" name="tour_bool" class="input" placeholder="0 no ; 1 yes"><?php if (!empty($_POST['tour_bool'])) {echo $_POST["tour_bool"];} ?></textarea></td>
             </tr>

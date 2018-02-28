@@ -165,42 +165,33 @@
     <?php
         include("../protected/config.php");
 
+        $query = 'SELECT id, common_name, scientific_name, latitude, longitude, description, tour_bool FROM treeMapDB.treesTable;';
+        $query .= 'SELECT filepath FROM treeMapDB.imageTable;';
 
-        $sql = "SELECT id, common_name, scientific_name, latitude, longitude, description, tour_bool FROM treeMapDB.treesTable";
-        $result = $db->query($sql);
+        $tree=array(array());
+        i=0;
+        //multi querry
+        if($db->multi_query($query))
+        {
+          //for first query, add data to an array
+          $result = $db->store_result();
+          while($row = $result->fetch_assoc()){
+            $tree1[i]= array('id'=>$row["id"],'common_name'=>$row["common_name"],'scientific_name'=>$row["scientific_name"],'latitude'=>$row["latitude"],'longitude'=>$row["longitude"],'description'=>$row["description"],'tour_bool'=>$row["tour_bool"]);
+            i = i + 1;
+          }
 
-        if ($result->num_rows > 0) {
-            ?>
-            <table id="myTable" class="table table-condensed">
-                <tr>
-                    <th>TreeID</th>
-                    <th>Common Name</th>
-                    <th>Scienctific Name</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
-                    <th>Description</th>
-                    <th>Image</th>
-                    <th>21 Tree Tour</th>
-                    <th>Manage</th>
-                </tr>
-            <?php
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                echo '
-                        <tr class="header">
-                            <td id="id"/>' . $row["id"] . ' </td>
-                            <td id="common_name"/>' . $row["common_name"] . ' </td>
-                            <td id="scientific_name"/>' . $row["scientific_name"] . ' </td>
-                            <td id="latitude"/>' . $row["latitude"] . ' </td>
-                            <td id="longitude"/>' . $row["longitude"] . ' </td>
-                            <td id="description"/><div class=scrollable>' . $row["description"] . '</div> </td>
-                            <td id="image"/></td>
-                            <td id="tour_bool"/>' . $row["tour_bool"] . ' </td>
-                            <td><a href="edit.php?id=' . $row["id"] .'">Edit</a> | <a href="delete.php?id=' . $row["id"] .'" onClick="javascript:confirmationDelete('. $row["id"] .');return false;" class="delete">Delete</a></td>
-                        </tr>';
+          j=0;
+          //for second query, add data to a different array
+          $db->next_result();
+          $result = $db->store_result();
+          while($row = $result->fetch_assoc()){
+            $tree2[j]=array('filepath'=>$row["filepath"]);
+            j = j + 1;
+          }
+
+          $tree=$tree1+$tree2;
+
         }
-    } else {
-        echo "0 results";
         ?>
         </table>
     <?php

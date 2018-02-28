@@ -11,7 +11,8 @@ while($row = mysqli_fetch_row($result))
     $d['scientific_name'] = $row[2];
     $d['latitude'] = $row[3];
     $d['longitude'] = $row[4];
-    
+    $d['description'] = $row[5];
+
     array_push($c,$d);
 }
 echo json_encode($c);

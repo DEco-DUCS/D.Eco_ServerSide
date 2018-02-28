@@ -13,7 +13,6 @@ if(isset($_POST['add']))
     $scientific_name=$_POST['scientific_name'];
     $latitude=$_POST['latitude'];
     $longitude=$_POST['longitude'];
-    $filepath=$_POST['filepath'];
     $description=$_POST['description'];
     $tour_bool=$_POST['tour_bool'];
     $image=$_FILES["image"]["name"];
@@ -66,12 +65,13 @@ if(isset($_POST['add']))
                       $msgTest = "in upload";
                         $filepath = 'upload/' . $image;
 
+
                         //save file in folder
                         move_uploaded_file($_FILES["image"]["tmp_name"],
                         $filepath);
 
                         //two queries
-                        $sql = "INSERT INTO treeMapDB.treesTable (common_name, scientific_name, latitude, longitude, filepath, description, tour_bool) VALUES ('$common_name', '$scientific_name', '$latitude', '$longitude', '$filepath', '$description', '$tour_bool');";
+                        $sql = "INSERT INTO treeMapDB.treesTable (common_name, scientific_name, latitude, longitude, description, tour_bool) VALUES ('$common_name', '$scientific_name', '$latitude', '$longitude', '$description', '$tour_bool');";
 
                         $sql .= "INSERT INTO treeMapDB.imageTable (treeid, filepath) VALUES ((SELECT id FROM treeMapDB.treesTable WHERE common_name = '$common_name' AND scientific_name = '$scientific_name' AND filepath = '$filepath' AND longitude = '$longitude' AND latitude = '$latitude'),'$filepath');";
 
@@ -93,7 +93,7 @@ if(isset($_POST['add']))
         //no file uploaded...
         else{
             //updating the trees table
-            $result = mysqli_query($db, "INSERT INTO treeMapDB.treesTable (common_name, scientific_name, latitude, longitude, filepath, description, tour_bool) VALUES ('$common_name', '$scientific_name', '$latitude', '$longitude', '$filepath', '$description', '$tour_bool')");
+            $result = mysqli_query($db, "INSERT INTO treeMapDB.treesTable (common_name, scientific_name, latitude, longitude, description, tour_bool) VALUES ('$common_name', '$scientific_name', '$latitude', '$longitude', '$description', '$tour_bool')");
         }
 
         $__DEBUG__ = false;

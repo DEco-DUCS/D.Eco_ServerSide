@@ -10,10 +10,8 @@ if(isset($_POST['update']))
     $scientific_name=$_POST['scientific_name'];
     $latitude=$_POST['latitude'];
     $longitude=$_POST['longitude'];
-    $filepath=$_POST['filepath'];
     $description=$_POST['description'];
     $tour_bool=$_POST['tour_bool'];
-    //$filepath=$_POST['filepath'];
 
     // checking empty fields
     if(empty($common_name) || empty($scientific_name) || empty($latitude) || empty($longitude)) {
@@ -56,9 +54,7 @@ if(isset($_POST['update']))
           || ($_FILES["image"]["type"] == "image/jpg")
           || ($_FILES["image"]["type"] == "image/gif")
           || ($_FILES["image"]["type"] == "image/png")
-          || ($_FILES["image"]["type"] == "image/jpeg"))
-          //&& ($_FILES["file"]["size"] < 20000)
-          && in_array($extension, $allowedExts)){
+          || ($_FILES["image"]["type"] == "image/jpeg"))){
             $msgTest = "in type check";
               // upload error
               if ($_FILES["image"]["error"] > 0)
@@ -67,6 +63,7 @@ if(isset($_POST['update']))
                   }
               //correct file extension
               else{
+                $msgTest = 'in else';
                  //if file already exits
                   if (file_exists("upload/" . $_FILES["image"]["name"]))
                     {
@@ -75,16 +72,16 @@ if(isset($_POST['update']))
                   //new file to upload
                   else{
                     $msgTest = "in upload";
-                      $filepath = 'upload/' . $image;
+                      $filepath = 'upload/' . $_FILES['image']['name'];
 
                       //save file in folder
                       move_uploaded_file($_FILES["image"]["tmp_name"],
                       $filepath);
 
                       //two queries
-                      $sql = "UPDATE treeMapDB.treesTable SET common_name='$common_name',scientific_name='$scientific_name',latitude='$latitude',longitude='$longitude',filepath='$filepath',description='$description',tour_bool='$tour_bool' WHERE id=$id;";
+                      $sql = "UPDATE treeMapDB.treesTable SET common_name='$common_name',scientific_name='$scientific_name',latitude='$latitude',longitude='$longitude',description='$description',tour_bool='$tour_bool' WHERE id=$id;";
 
-                      $sql .= "INSERT INTO treeMapDB.imageTable (treeid, filepath) VALUES ((SELECT id FROM treeMapDB.treesTable WHERE common_name = '$common_name' AND scientific_name = '$scientific_name' AND filepath = '$filepath' AND longitude = '$longitude' AND latitude = '$latitude'),'$filepath');";
+                      $sql .= "INSERT INTO treeMapDB.imageTable (treeid, filepath) VALUES ((SELECT id FROM treeMapDB.treesTable WHERE common_name = '$common_name' AND scientific_name = '$scientific_name' AND longitude = '$longitude' AND latitude = '$latitude'),'$filepath');";
 
                       //execute multi query
                       if (!$db->multi_query($sql)) {
@@ -103,10 +100,10 @@ if(isset($_POST['update']))
             }
         else{
           //updating the table
-          $result = mysqli_query($db, "UPDATE treeMapDB.treesTable SET common_name='$common_name',scientific_name='$scientific_name',latitude='$latitude',longitude='$longitude',filepath='$filepath',description='$description',tour_bool='$tour_bool' WHERE id=$id");
+          $result = mysqli_query($db, "UPDATE treeMapDB.treesTable SET common_name='$common_name',scientific_name='$scientific_name',latitude='$latitude',longitude='$longitude',description='$description',tour_bool='$tour_bool' WHERE id=$id");
         }
-        //redirectig to the display page. In our case, it is index.php
-        //header("Location: main.php");
+        //redirectig to main.php
+        header("Location: main.php");
     }
 }
 ?>
@@ -115,52 +112,60 @@ if(isset($_POST['update']))
 $id = $_GET['id'];
 
 //get data for single tree from the treeTable
-$query = 'SELECT id, common_name, scientific_name, latitude, longitude, filepath, description, tour_bool FROM treeMapDB.treesTable WHERE id=' . $id .'';
-$result = mysqli_query($db, $query);
-while($row = mysqli_fetch_array($result))
+$query = 'SELECT id, common_name, scientific_name, latitude, longitude, description, tour_bool FROM treeMapDB.treesTable WHERE id=' . $id .';';
+$query .= 'SELECT filepath FROM treeMapDB.imageTable WHERE treeid = '.$id.';';
+
+
+//multi querry
+if($db->multi_query($query))
 {
-    $id = $row['id'];
-    $common_name=$row['common_name'];
-    $scientific_name=$row['scientific_name'];
-    $latitude=$row['latitude'];
-    $longitude=$row['longitude'];
-    //$filepath=$row['filepath'];
-    $description=$row['description'];
-    $tour_bool=$row['tour_bool'];
+  //for first query, add data to an array
+  $result = $db->store_result();
+  $row = $result->fetch_assoc();
+  $tree1= array('id'=>$row["id"],'common_name'=>$row["common_name"],'scientific_name'=>$row["scientific_name"],'latitude'=>$row["latitude"],'longitude'=>$row["longitude"],'description'=>$row["description"],'tour_bool'=>$row["tour_bool"]);
+
+  //for second query, add data to a different array
+  $db->next_result();
+  $result = $db->store_result();
+  $row = $result->fetch_assoc();
+  $tree2=array('filepath'=>$row["filepath"]);
+
+  $tree=$tree1+$tree2;
+
 }
 
-//add data from treeTable to an array
-$tree = array('id' => $id, 'common_name' => $common_name, 'scientific_name' => $scientific_name, 'latitude' => $latitude, 'longitude' => $longitude, 'description' => $description, 'tour_bool' => $tour_bool, 'filepath' => $filepath);
-
-//get data from the imageTable
-$query2 = 'SELECT filepath FROM treeMapDB.imageTable WHERE treeid = '.$id.'';
-$result2 = mysqli_query($db, $query2);
-while($row2 = mysqli_fetch_array($result2))
-{
-    $imageFilepath=$row2['filepath'];
-}
-
-if(!empty($imageFilepath)){
-    //add data from ImageTable to array
-    $tree['filepath'] = $imageFilepath;
-    $form = '<td><img src="'.$imageFilepath.'"width="20" height="20"> </td>
-    <td><input type="checkbox" name="Delete"/>Delete';
+//to check to be sure there is a photo in the DB for the tree
+if(!empty($tree["filepath"])){
+    //create a html tag for an image
+    $form = '
+      <tr>
+        <td>Current Image</td>
+        <td><img src="'.$tree["filepath"].'"width="20" height="20"> </td>
+        <td><input type="checkbox" name="Delete"/>Delete
+      </tr><tr></tr>';
 }
 else{
-    $tree['filepath'] = $imageFilepath;
-    $form = '<td><input type="text" name="filepath" value="None" readonly style="
-    font-family: sans-serif;
-    outline: 0;
-    background: #f2f2f2;
-    width: 100%;
-    border: 0;
-    margin: 0 0 15px;
-    padding: 10px;
-    box-sizing: border-box;
-    font-size: 14px;"></td>';
+    //create an uneditable text box to indicate that there is no photo for the tree
+    $form = '
+      <tr><td>Current Image</td>
+        <td><input type="text" name="filepath" value="None" readonly style="
+        font-family: sans-serif;
+        outline: 0;
+        background: #f2f2f2;
+        width: 100%;
+        border: 0;
+        margin: 0 0 15px;
+        padding: 10px;
+        box-sizing: border-box;
+        font-size: 14px;"></td>
+        <tr><td>Add Image</td>
+        <td><input type="file" name="image" id="image" />
+            <br/>
+        </td>
+        </tr>
+      </tr>
+        ';
 }
-
-$errorMessage = 'Image Filepath: '.$filepath;
 
 ?>
 <html>
@@ -260,10 +265,10 @@ $errorMessage = 'Image Filepath: '.$filepath;
 
     <div class="form">
         <img src="../photos/TeamLogo.png" alt="Team Logo">
-        <h1>Update Tree: <?php echo $common_name; ?></h1>
-        <?php echo "<h2 class='error'>".$errorFilepath.$msgTest.$errorMessage.$msgCN.$msgSN.$msgLat.$msgLong."</h2>"; ?>
+        <h1>Update Tree: <?php echo $tree['common_name']; ?></h1>
+        <?php echo "<h2 class='error'>".$msgError.$error.$errorFilepath.$msgTest.$errorMessage.$msgCN.$msgSN.$msgLat.$msgLong."</h2>"; ?>
 
-    <form name="edit" method="post" action="edit.php">
+    <form name="edit" method="post" action="edit.php" enctype="multipart/form-data">
         <table border="0">
 <!--
             <tr>
@@ -287,15 +292,7 @@ $errorMessage = 'Image Filepath: '.$filepath;
                 <td>Longitude</td>
                 <td colspan=2><input type="text" name="longitude" value="<?php echo $tree['longitude'];?>" class="input" placeholder="Required"></td>
             </tr>
-            <tr>
-                <td>Current Image(s)</td>
-                <?php echo $form;?>
-            </tr>
-            <tr>
-                <td>Add Image</td>
-                <td colspan=2><input type="file" name="image" id="image" />
-                    <br/></td>
-            </tr>
+        <?php echo $form; ?>
             <tr>
                 <td>Description</td>
                 <td colspan=2><textarea type="text" name="description" class="input"><?php echo $tree['description'];?></textarea></td>

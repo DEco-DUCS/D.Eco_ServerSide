@@ -12,29 +12,11 @@
 
               // Loop through all table rows, and hide those who don't match the search query
               for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
-                if (td) {
-                  if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                  } else {
-                    tr[i].style.display = "none";
-                  }
-                }
-              }
-            }
-            function scientificName() {
-              // Declare variables
-              var input, filter, table, tr, td, i;
-              input = document.getElementById("myInput");
-              filter = input.value.toUpperCase();
-              table = document.getElementById("myTable");
-              tr = table.getElementsByTagName("tr");
-
-              // Loop through all table rows, and hide those who don't match the search query
-              for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[2];
-                if (td) {
-                  if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                tdCommonName = tr[i].getElementsByTagName("td")[1];
+                tdScientificName = tr[i].getElementsByTagName("td")[2];
+                tdTour = tr[i].getElementsByTagName("td")[7];
+                if (tdCommonName || tdScientificName) {
+                  if (tdCommonName.innerHTML.toUpperCase().indexOf(filter) > -1 || tdScientificName.innerHTML.toUpperCase().indexOf(filter) > -1 || tdTour.innerHTML.toUpperCase().indexOf(filter) > -1) {
                     tr[i].style.display = "";
                   } else {
                     tr[i].style.display = "none";
@@ -81,7 +63,22 @@
             td {
                 height: 50px;
                 padding: 15px;
-            }
+                /* overflow: hidden; */
+                /* max-width: 400px;
+                word-wrap: break-word; */
+                white-space: pre-wrap; /* css-3 */
+                white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+                white-space: -pre-wrap; /* Opera 4-6 */
+                white-space: -o-pre-wrap; /* Opera 7 */
+                word-wrap: break-word;
+                }
+            div.scrollable {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: auto;
+              }
 
             body {
                 background: #8DC26F; /* fallback for old browsers */
@@ -139,6 +136,10 @@
                 border: 1px solid #ddd; /* Add a grey border */
                 margin-bottom: 12px; /* Add some space below the input */
             }
+            #description {
+                width:500px;
+                height: 50px;
+            }
             .logout {
                 position:relative;
             }
@@ -158,18 +159,11 @@
         <h1>Manage Trees</h1>
             <h2><a href="add.php" class="addTree">Add Trees</a>
         </h2>
-            <input type="text" id="myInput" class="myInput" onkeyup="commonName()" placeholder="Search for Common Names">
-<!--            <input type="text" id="myInput" onkeyup="scientificName()" placeholder="Search for Scientific Names">-->
+            <input type="text" id="myInput" class="myInput" onkeyup="commonName()" placeholder="Search for Common Names, Scientfic Names, or Tree Tour">
+
     <?php
         include("../protected/config.php");
 
-//        // Check connection
-//        if ($db->connect_error) {
-//            die("Connection failed: " . $db->connect_error);
-//        }
-//        else {
-//            echo "Connected successfully";
-//        }
 
         $sql = "SELECT id, common_name, scientific_name, latitude, longitude, description, tour_bool FROM treeMapDB.treesTable";
         $result = $db->query($sql);
@@ -198,7 +192,7 @@
                             <td id="scientific_name"/>' . $row["scientific_name"] . ' </td>
                             <td id="latitude"/>' . $row["latitude"] . ' </td>
                             <td id="longitude"/>' . $row["longitude"] . ' </td>
-                            <td id="description"/>' . $row["description"] . ' </td>
+                            <td id="description"/><div class=scrollable>' . $row["description"] . '</div> </td>
                             <td id="image"/>image</td>
                             <td id="tour_bool"/>' . $row["tour_bool"] . ' </td>
                             <td><a href="edit.php?id=' . $row["id"] .'">Edit</a> | <a href="delete.php?id=' . $row["id"] .'" onClick="javascript:confirmationDelete('. $row["id"] .');return false;" class="delete">Delete</a></td>

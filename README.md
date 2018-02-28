@@ -20,8 +20,9 @@ Technology:
   * AWS - https://console.aws.amazon.com/console/home
 
 Repository Structure:
-* adminPHP: the php script creating the admin page for managing the database information
+* AdminPHP: the php script creating the admin page for managing the database information (adminPHP is extra, problems happening trying to delete)
 * jsonPHP: the php script creating the JSON objects that holds the information from the database for the trees
+* DatabaseTables: backup to the tables for mySQL Workbench
 
 ### Setting Up Environment
 
@@ -41,7 +42,14 @@ Repository Structure:
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+* Deployed on Amazon Web Services (AWS) EC2 instance
+* Path to running script: http://ec2-34-210-217-19.us-west-2.compute.amazonaws.com/PHP/html/adminPHP/html/main.php
+* Create hidden directory on EC2 instance to store your directory
+* Change owner access permission (i.e., read, write, exectute permissions) for the folder that will store the images
+
+```
+sudo chown apache:apache /path/to/folder/for/images
+```
 
 
 ## Authors

@@ -15,9 +15,9 @@
                 tdCommonName = tr[i].getElementsByTagName("td")[1];
                 tdScientificName = tr[i].getElementsByTagName("td")[2];
                 tdTour = tr[i].getElementsByTagName("td")[7];
-                tdDescription = tr[i].getElementsByTagName("td")[5];
+                //tdDescription = tr[i].getElementsByTagName("td")[5];
                 if (tdCommonName || tdScientificName) {
-                  if (tdCommonName.innerHTML.toUpperCase().indexOf(filter) > -1 || tdScientificName.innerHTML.toUpperCase().indexOf(filter) > -1 || tdTour.innerHTML.toUpperCase().indexOf(filter) > -1 || tdDescription.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                  if (tdCommonName.innerHTML.toUpperCase().indexOf(filter) > -1 || tdScientificName.innerHTML.toUpperCase().indexOf(filter) > -1 || tdTour.innerHTML.toUpperCase().indexOf(filter) > -1) {
                     tr[i].style.display = "";
                   } else {
                     tr[i].style.display = "none";
@@ -160,14 +160,18 @@
         <h1>Manage Trees</h1>
             <h2><a href="add.php" class="addTree">Add Trees</a>
         </h2>
-            <input type="text" id="myInput" class="myInput" onkeyup="commonName()" placeholder="Search by Common Name, Scientfic Name, Description or Tree Tour">
+            <input type="text" id="myInput" class="myInput" onkeyup="commonName()" placeholder="Search by Common Name, Scientfic Name or Tree Tour">
 
     <?php
         include("../protected/config.php");
 
 
-        $sql = "SELECT id, common_name, scientific_name, latitude, longitude, description, tour_bool FROM treeMapDB.treesTable";
+        $sql = "SELECT treeMapDB.treesTable.id, treeMapDB.treesTable.common_name, treeMapDB.treesTable.scientific_name, treeMapDB.treesTable.latitude, treeMapDB.treesTable.longitude, treeMapDB.treesTable.description, treeMapDB.treesTable.tour_bool, treeMapDB.imageTable.filepath
+        FROM treeMapDB.treesTable
+        LEFT JOIN treeMapDB.imageTable ON treesTable.id = imageTable.treeid ORDER BY treeMapDB.treesTable.id;";
         $result = $db->query($sql);
+
+
 
         if ($result->num_rows > 0) {
             ?>
@@ -186,6 +190,14 @@
             <?php
             // output data of each row
             while($row = $result->fetch_assoc()) {
+              if(!empty($row["filepath"])){
+                  //create a html tag for an image
+                  $img = '<div style = "width:100%;"><img src="'.$row["filepath"].'"width="20" height="20"></div>';
+              }
+              else{
+                  //create an uneditable text box to indicate that there is no photo for the tree
+                  $img = '';
+              }
                 echo '
                         <tr class="header">
                             <td id="id"/>' . $row["id"] . ' </td>
@@ -194,7 +206,7 @@
                             <td id="latitude"/>' . $row["latitude"] . ' </td>
                             <td id="longitude"/>' . $row["longitude"] . ' </td>
                             <td id="description"/><div class=scrollable>' . $row["description"] . '</div> </td>
-                            <td id="image"/></td>
+                            <td id="image"/>'.$img.'</td>
                             <td id="tour_bool"/>' . $row["tour_bool"] . ' </td>
                             <td><a href="edit.php?id=' . $row["id"] .'">Edit</a> | <a href="delete.php?id=' . $row["id"] .'" onClick="javascript:confirmationDelete('. $row["id"] .');return false;" class="delete">Delete</a></td>
                         </tr>';

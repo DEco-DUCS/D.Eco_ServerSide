@@ -18,15 +18,16 @@ Download Software:
 Technology:
 * Currently the backend is on Amazon Web Services (AWS) but it will all be moved to a serve on Drury's campus
   * AWS - https://console.aws.amazon.com/console/home
+    * EC2 Instance house PHP scripts
 
 Repository Structure:
 * AdminPHP: the php script creating the admin page for managing the database information (adminPHP is extra, problems happening trying to delete)
 * jsonPHP: the php script creating the JSON objects that holds the information from the database for the trees
 * DatabaseTables: backup to the tables for mySQL Workbench
 
-### Setting Up Environment
+### Setting Up Development Environment
 
-#### Running PHP Script
+#### Testing PHP Script Locally
 1. Put PHP code in /Applications/MAMP/htdocs
 2. Start MAMP MySQL and Apache server
 3. Visit http://localhost:8888/ to see running PHP script
@@ -36,7 +37,6 @@ Repository Structure:
 * Tables
   * admin - contains username and password login information for access to the Admin Website
   * imageTable - contains imageID (primary key), treeID (foriegn key), filepath (to image in server), and title
-  * trees - contains the information for the 21 trees tour
   * treesTable - contains the informations for the 500+ tree on Drury's campus
    * (for any addition information about the trees' information contact Dr. Popescu)
 
@@ -50,7 +50,6 @@ Repository Structure:
 ```
 sudo chown apache:apache /path/to/folder/for/images
 ```
-
 
 ## Authors
 

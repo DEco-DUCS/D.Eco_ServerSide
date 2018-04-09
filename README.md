@@ -27,7 +27,7 @@ Repository Structure:
 
 ### Setting Up Development Environment
 
-#### Testing PHP Script Locally
+#### Testing PHP Script Locally (on Mac)
 1. Put PHP code in /Applications/MAMP/htdocs
 2. Start MAMP MySQL and Apache server
 3. Visit http://localhost:8888/ to see running PHP script
@@ -37,7 +37,7 @@ Repository Structure:
 * Tables
   * admin - contains username and password login information for access to the Admin Website
   * imageTable - contains imageID (primary key), treeID (foriegn key), filepath (to image in server), and title
-  * treesTable - contains the informations for the 500+ tree on Drury's campus
+  * treesTable - contains the information for the 500+ tree on Drury's campus
    * (for any addition information about the trees' information contact Dr. Popescu)
 
 ## Deployment
@@ -50,6 +50,11 @@ Repository Structure:
 ```
 sudo chown apache:apache /path/to/folder/for/images
 ```
+
+## Next steps
+
+* Make site secure/unaccessable outside of user login
+* Add images to all trees (talk to Dr. Popescu)
 
 ## Authors
 

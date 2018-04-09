@@ -136,6 +136,7 @@ if($db->multi_query($query))
 
 //to check to be sure there is a photo in the DB for the tree
 if(!empty($tree["filepath"])){
+    if(file_exists($tree["filepath"])){
     //create a html tag for an image
     $form = '
       <tr>
@@ -143,6 +144,16 @@ if(!empty($tree["filepath"])){
         <td><img src="'.$tree["filepath"].'"width="20" height="20"> </td>
         <td><input type="checkbox" name="Delete"/>Delete
       </tr><tr></tr>';
+    }
+    else{
+      $form = '
+      <tr>
+        <td>Current Image</td>
+        <td><textarea type="text" name="img" rows="2" style="resize:none;" class="input">Image not found at current filepath</textarea></td>
+        <td><input type="checkbox" name="Delete"/>Delete existing filepath
+      </tr><tr></tr>';
+
+    }
 }
 else{
     //create an uneditable text box to indicate that there is no photo for the tree
@@ -189,10 +200,10 @@ else{
                 font-family: "Roboto", sans-serif;
                 text-transform: uppercase;
                 outline: 0;
-                background: #4CAF50;
+                background: #e8e8e8;
                 border: 0;
                 padding: 15px;
-                color: #8DC26F;
+                color: #98bf78;
                 font-size: 14px;
                 -webkit-transition: all 0.3 ease;
                 transition: all 0.3 ease;
@@ -282,7 +293,7 @@ else{
             </tr>
             <tr>
                 <td>Scientific Name</td>
-                <td colspan=2><textarea type="text" name="scientific_name" class="input" placeholder="Required"><?php echo $tree['scientific_name'];?></textarea></td>
+                <td colspan=2><textarea type="text" name="scientific_name" class="input" placeholder="Required" style="resize:none" rows="1"><?php echo $tree['scientific_name'];?></textarea></td>
             </tr>
             <tr>
                 <td>Latitude</td>
@@ -295,11 +306,11 @@ else{
         <?php echo $form; ?>
             <tr>
                 <td>Description</td>
-                <td colspan=2><textarea type="text" name="description" class="input"><?php echo $tree['description'];?></textarea></td>
+                <td colspan=2><textarea type="text" name="description" style="resize:none;" rows="6" class="input"><?php echo $tree['description'];?></textarea></td>
             </tr>
             <tr>
                 <td>21 Tree Tour</td>
-                <td colspan=2><textarea type="text" name="tour_bool" class="input" placeholder="0 no ; 1 yes"><?php echo $tree['tour_bool'];?></textarea></td>
+                <td colspan=2><input type="text" name="tour_bool" class="input" placeholder="enter 1 or 0 (yes or no)" value="<?php echo $tree['tour_bool'];?>"></td>
             </tr>
             <tr>
                 <td><input type="hidden" name="id" value=<?php echo $_GET['id'];?>></td>

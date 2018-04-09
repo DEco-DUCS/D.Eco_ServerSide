@@ -108,10 +108,10 @@
                 font-family: "Roboto", sans-serif;
                 text-transform: uppercase;
                 outline: 0;
-                background: #4CAF50;
+                background: #e8e8e8;
                 border: 0;
                 padding: 15px;
-                color: #8DC26F;
+                color: #98bf78;
                 font-size: 14px;
                 -webkit-transition: all 0.3 ease;
                 transition: all 0.3 ease;
@@ -191,12 +191,25 @@
             // output data of each row
             while($row = $result->fetch_assoc()) {
               if(!empty($row["filepath"])){
-                  //create a html tag for an image
-                  $img = '<div style = "width:100%;"><img src="'.$row["filepath"].'"width="20" height="20"></div>';
+                  //check to be sure image in that filepath
+                  if(file_exists($row['filepath'])){
+                    //create a html tag for an image
+                    $img = '<div style = "width:100%;"><img src="'.$row["filepath"].'"width="20" height="20"></div>';
+                  }
+                  //if image doesn't exist in directory
+                  else{
+                    $img = "Image not found at current filepath";
+                  }
               }
               else{
                   //create an uneditable text box to indicate that there is no photo for the tree
                   $img = '';
+              }
+              if(!empty($row["description"])){
+                $description = '<div style="overflow-y: scroll; overflow-x:hidden; height:150px;">' . $row["description"] . '</div>';
+              }
+              else{
+                $description = '';
               }
                 echo '
                         <tr class="header">
@@ -205,7 +218,7 @@
                             <td id="scientific_name"/>' . $row["scientific_name"] . ' </td>
                             <td id="latitude"/>' . $row["latitude"] . ' </td>
                             <td id="longitude"/>' . $row["longitude"] . ' </td>
-                            <td id="description"/><div class=scrollable>' . $row["description"] . '</div> </td>
+                            <td id="description"/>'. $description .'</td>
                             <td id="image"/>'.$img.'</td>
                             <td id="tour_bool"/>' . $row["tour_bool"] . ' </td>
                             <td><a href="edit.php?id=' . $row["id"] .'">Edit</a> | <a href="delete.php?id=' . $row["id"] .'" onClick="javascript:confirmationDelete('. $row["id"] .');return false;" class="delete">Delete</a></td>

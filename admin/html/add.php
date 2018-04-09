@@ -135,10 +135,10 @@ if(isset($_POST['add']))
                 font-family: "Roboto", sans-serif;
                 text-transform: uppercase;
                 outline: 0;
-                background: #4CAF50;
+                background: #e8e8e8;
                 border: 0;
                 padding: 15px;
-                color: #8DC26F;
+                color: #98bf78;
                 font-size: 14px;
                 -webkit-transition: all 0.3 ease;
                 transition: all 0.3 ease;
@@ -221,7 +221,7 @@ if(isset($_POST['add']))
             </tr>
             <tr>
                 <td>Scientific Name</td>
-                <td><textarea type="text" name="scientific_name" placeholder="Required" class="input"><?php if (!empty($_POST['scientific_name'])) {echo $_POST["scientific_name"];} ?></textarea></td>
+                <td><textarea type="text" rows="1" style="resize: none;" name="scientific_name" placeholder="Required" class="input"><?php if (!empty($_POST['scientific_name'])) {echo $_POST["scientific_name"];} ?></textarea></td>
             </tr>
             <tr>
                 <td>Latitude</td>
@@ -238,11 +238,11 @@ if(isset($_POST['add']))
             </tr>
             <tr>
                 <td>Description</td>
-                <td><textarea type="text" name="description" class="input"><?php if (!empty($_POST['description'])) {echo $_POST["description"];} ?></textarea></td>
+                <td><textarea type="text" rows="6" name="description" style="resize:none;"class="input"><?php if (!empty($_POST['description'])) {echo $_POST["description"];} ?></textarea></td>
             </tr>
             <tr>
                 <td>21 Tree Tour</td>
-                <td><textarea type="text" name="tour_bool" class="input" placeholder="0 no ; 1 yes"><?php if (!empty($_POST['tour_bool'])) {echo $_POST["tour_bool"];} ?></textarea></td>
+                <td><textarea type="text" name="tour_bool" rows="1" style="resize:none;"class="input" placeholder="enter 1 or 0 (yes or no)"><?php if (!empty($_POST['tour_bool'])) {echo $_POST["tour_bool"];} ?></textarea></td>
             </tr>
             <tr>
                 <td><input type="hidden" name="id" value="add"></td>
